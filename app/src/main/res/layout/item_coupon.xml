@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
+
+    <!-- Title of the Coupon -->
+    <TextView
+        android:id="@+id/tv_coupon_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Coupon Title"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_mark_as_used"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Description of the Coupon -->
+    <TextView
+        android:id="@+id/tv_coupon_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Coupon description here."
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_mark_as_used"
+        app:layout_constraintTop_toBottomOf="@id/tv_coupon_title"
+        app:layout_constraintBottom_toTopOf="@id/btn_mark_as_used" />
+
+    <!-- Button to Mark the Coupon as Used -->
+    <Button
+        android:id="@+id/btn_mark_as_used"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mark as Used"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File: activity_sign_up.xml
+    Description: Layout file for the sign-up page where users enter their details (username, email, password, and confirm password).
+    It uses a neat, simple design with fields centered on the screen.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="20dp"
+    android:background="@android:color/white">
+
+    <!-- Username EditText Field -->
+    <EditText
+        android:id="@+id/et_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/username_hint"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/ocean_blue"
+        android:inputType="text" /> <!-- Added inputType -->
+
+    <!-- Email EditText Field -->
+    <EditText
+        android:id="@+id/et_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/email_hint"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"
+        android:inputType="textEmailAddress"
+        android:backgroundTint="@color/ocean_blue" />
+
+    <!-- Password EditText Field -->
+    <EditText
+        android:id="@+id/et_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/password_hint"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"
+        android:inputType="textPassword"
+        android:backgroundTint="@color/ocean_blue" />
+
+    <!-- Confirm Password EditText Field -->
+    <EditText
+        android:id="@+id/et_confirm_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/confirm_password_hint"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:layout_marginBottom="24dp"
+        android:inputType="textPassword"
+        android:backgroundTint="@color/ocean_blue" />
+
+    <!-- Sign Up Button -->
+    <Button
+        android:id="@+id/btn_sign_up"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sign_up"
+        android:backgroundTint="@color/bright_purple"
+        android:textColor="@android:color/white"
+        android:padding="12dp"
+        android:textSize="18sp" />
+
+</LinearLayout>

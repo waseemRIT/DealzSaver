@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    network_security_config.xml
+    Description: This file allows cleartext (HTTP) traffic to the specified server for development purposes.
+    This is necessary because the Flask API in this setup uses HTTP instead of HTTPS.
+    In a production environment, it is highly recommended to use HTTPS for security.
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Specify the IP or domain that the app is allowed to communicate with using cleartext HTTP -->
+        <domain includeSubdomains="true">45.33.102.27</domain>
+    </domain-config>
+</network-security-config>

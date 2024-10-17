@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    File: activity_profile.xml
+    Description: This layout file is for the Profile Page. It includes a greeting text ("Hi, username!")
+                 at the top and a RecyclerView to display the user's coupons in a neat design.
+    Vulnerabilities: None in this layout, but how the coupons are handled could expose vulnerabilities if not implemented securely.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- Greeting Text ("Hi, username!") -->
+    <TextView
+        android:id="@+id/tv_greeting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hi, username!"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_gravity="center"
+        android:paddingBottom="16dp"/>
+
+    <!-- RecyclerView to display the coupons -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewCoupons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:dividerHeight="16dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="8dp" />
+
+</LinearLayout>
