@@ -16,14 +16,14 @@ import java.io.IOException
 
 class SignUpActivity : AppCompatActivity() {
 
-    // Defining the base URL of Flask API
+    // Defining the base URL of the Flask API
     private val baseUrl = "http://45.33.102.27:5000/signup"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
 
-        // Geting references to the EditText fields and buttons
+        // Getting references to the EditText fields and buttons
         val usernameEditText = findViewById<EditText>(R.id.et_username)
         val emailEditText = findViewById<EditText>(R.id.et_email)
         val passwordEditText = findViewById<EditText>(R.id.et_password)
@@ -41,41 +41,38 @@ class SignUpActivity : AppCompatActivity() {
             if (password == confirmPassword) {
                 // Check if fields are not empty
                 if (username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-                    // Launching a new coroutine in the IO context, which is suitable for offloading tasks that involve blocking operations,
-                    // such as network requests, to avoid blocking the main thread (UI thread).
-                    // And since we are sending http request it would cause a block
+                    // Launching a new coroutine in the IO context for network request
                     CoroutineScope(Dispatchers.IO).launch {
+                        // Logging the registration attempt
+                        println("Attempting to sign up user: $username with email: $email")
+
                         // Calling the signUpUser function, which handles the HTTP request to register the user.
-                        // The function returns a Boolean indicating whether the sign-up was successful.
                         val success = signUpUser(username, email, password)
 
-                        // Switch back to the main thread (UI thread) to update the UI components, since UI updates can only be done on the main thread.
+                        // Switch back to the main thread (UI thread) to update the UI components
                         withContext(Dispatchers.Main) {
                             // Checking the result of the sign-up process
                             if (success) {
-                                // If the sign-up was successful, show a success message using a Toast
-                                // Toast: A small popup message that is used to provide feedback to the user.
+                                // If sign-up was successful, show success message
                                 Toast.makeText(this@SignUpActivity, "User registered successfully!", Toast.LENGTH_SHORT).show()
-                                // Log the successful navigation for debugging purposes
-                                println("Navigating to ProfileActivity with username: $username")
+                                println("User $username registered successfully.")
+
                                 // Creating an Intent to start the ProfileActivity
-                                // Intent: An object used to start another activity (in this case, ProfileActivity) and pass data between activities.
                                 val intent = Intent(this@SignUpActivity, ProfileActivity::class.java)
-                                // Passing the username to the ProfileActivity so it can personalize the greeting
-                                intent.putExtra("username", username)
-                                // Starting the ProfileActivity
-                                startActivity(intent)
-                                // Closing the SignUpActivity to remove it from the back stack
-                                finish()
-                            } else {     // If the sign-up failed, show an error message using a Toast
+                                intent.putExtra("username", username) // Passing the username to ProfileActivity
+                                startActivity(intent) // Starting the ProfileActivity
+                                finish() // Closing the SignUpActivity
+                            } else {
+                                // If sign-up failed, show an error message
                                 Toast.makeText(this@SignUpActivity, "Sign-up failed", Toast.LENGTH_SHORT).show()
+                                println("User registration failed.")
                             }
                         }
                     }
-                } else { // If any of the fields are empty, show a Toast message prompting the user to fill out all fields
+                } else { // If any fields are empty, prompt the user to fill them out
                     Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show()
                 }
-            } else { // If the passwords do not match, show a Toast message informing the user
+            } else { // If passwords do not match, inform the user
                 Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
             }
         }
@@ -114,19 +111,20 @@ class SignUpActivity : AppCompatActivity() {
 
             // Log the response for debugging
             val responseBody = response.body?.string()
-            println("API Response: $responseBody")
+            println("API Response: $responseBody") // Logging the API response
 
             if (response.isSuccessful) {
                 // The request was successful
+                println("User registration successful for $username.")
                 true
             } else {
                 // The request failed, log the failure
-                println("Failed response: ${response.message}")
+                println("Failed response: ${response.message}") // Logging failed response
                 false
             }
         } catch (e: IOException) {
             // There was an error with the request, log the error
-            e.printStackTrace()
+            e.printStackTrace() // Print stack trace for debugging
             false
         }
     }
