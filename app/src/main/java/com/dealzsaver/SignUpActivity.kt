@@ -16,21 +16,21 @@ import java.io.IOException
 
 class SignUpActivity : AppCompatActivity() {
 
-    // Define the base URL of your Flask API
+    // Defining the base URL of Flask API
     private val baseUrl = "http://45.33.102.27:5000/signup"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
 
-        // Get references to the EditText fields and buttons
+        // Geting references to the EditText fields and buttons
         val usernameEditText = findViewById<EditText>(R.id.et_username)
         val emailEditText = findViewById<EditText>(R.id.et_email)
         val passwordEditText = findViewById<EditText>(R.id.et_password)
         val confirmPasswordEditText = findViewById<EditText>(R.id.et_confirm_password)
         val signUpButton = findViewById<Button>(R.id.btn_sign_up)
 
-        // Handle the sign-up button click
+        // Handling the sign-up button click
         signUpButton.setOnClickListener {
             val username = usernameEditText.text.toString()
             val email = emailEditText.text.toString()
@@ -41,29 +41,41 @@ class SignUpActivity : AppCompatActivity() {
             if (password == confirmPassword) {
                 // Check if fields are not empty
                 if (username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-                    // Run the sign-up process in a background thread using coroutines
+                    // Launching a new coroutine in the IO context, which is suitable for offloading tasks that involve blocking operations,
+                    // such as network requests, to avoid blocking the main thread (UI thread).
+                    // And since we are sending http request it would cause a block
                     CoroutineScope(Dispatchers.IO).launch {
+                        // Calling the signUpUser function, which handles the HTTP request to register the user.
+                        // The function returns a Boolean indicating whether the sign-up was successful.
                         val success = signUpUser(username, email, password)
 
-                        // Switch back to the main thread to update the UI
+                        // Switch back to the main thread (UI thread) to update the UI components, since UI updates can only be done on the main thread.
                         withContext(Dispatchers.Main) {
+                            // Checking the result of the sign-up process
                             if (success) {
+                                // If the sign-up was successful, show a success message using a Toast
+                                // Toast: A small popup message that is used to provide feedback to the user.
                                 Toast.makeText(this@SignUpActivity, "User registered successfully!", Toast.LENGTH_SHORT).show()
-                                // Log to verify
+                                // Log the successful navigation for debugging purposes
                                 println("Navigating to ProfileActivity with username: $username")
+                                // Creating an Intent to start the ProfileActivity
+                                // Intent: An object used to start another activity (in this case, ProfileActivity) and pass data between activities.
                                 val intent = Intent(this@SignUpActivity, ProfileActivity::class.java)
-                                intent.putExtra("username", username)  // Pass the username to the ProfileActivity
+                                // Passing the username to the ProfileActivity so it can personalize the greeting
+                                intent.putExtra("username", username)
+                                // Starting the ProfileActivity
                                 startActivity(intent)
-                                finish() // Close the sign-up activity
-                            } else {
+                                // Closing the SignUpActivity to remove it from the back stack
+                                finish()
+                            } else {     // If the sign-up failed, show an error message using a Toast
                                 Toast.makeText(this@SignUpActivity, "Sign-up failed", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
-                } else {
+                } else { // If any of the fields are empty, show a Toast message prompting the user to fill out all fields
                     Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show()
                 }
-            } else {
+            } else { // If the passwords do not match, show a Toast message informing the user
                 Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
             }
         }

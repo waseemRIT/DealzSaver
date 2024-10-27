@@ -1,11 +1,11 @@
 package com.dealzsaver
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -18,63 +18,62 @@ class ProfileActivity : AppCompatActivity() {
     // Define the Flask API base URL for updating coupon status
     private val baseUrl = "http://45.33.102.27:5000/update_coupon"
 
-    // Declare RecyclerView and adapter to display the coupons
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: CouponAdapter
-    private val coupons = mutableListOf<Coupon>() // List to store fetched coupons
+    // Declare TextViews for displaying coupon details
+    private lateinit var coupon1TitleTextView: TextView
+    private lateinit var coupon1DescriptionTextView: TextView
+    private lateinit var coupon1UsedButton: Button
+
+    private lateinit var coupon2TitleTextView: TextView
+    private lateinit var coupon2DescriptionTextView: TextView
+    private lateinit var coupon2UsedButton: Button
+
+    private lateinit var coupon3TitleTextView: TextView
+    private lateinit var coupon3DescriptionTextView: TextView
+    private lateinit var coupon3UsedButton: Button
+
+    // Coupon codes for tracking
+    private var coupon1Code: String = ""
+    private var coupon2Code: String = ""
+    private var coupon3Code: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile) // Set the layout to activity_profile.xml
 
-        // Reference to the RecyclerView in the layout
-        recyclerView = findViewById(R.id.recyclerViewCoupons)
+        // Initialize TextViews and Buttons from the layout
+        coupon1TitleTextView = findViewById(R.id.tv_coupon1_title)
+        coupon1DescriptionTextView = findViewById(R.id.tv_coupon1_description)
+        coupon1UsedButton = findViewById(R.id.btn_coupon1_used)
 
-        // Reference to the greeting TextView in the layout
-        val greetingTextView = findViewById<TextView>(R.id.tv_greeting)
+        coupon2TitleTextView = findViewById(R.id.tv_coupon2_title)
+        coupon2DescriptionTextView = findViewById(R.id.tv_coupon2_description)
+        coupon2UsedButton = findViewById(R.id.btn_coupon2_used)
 
-        // Set up the RecyclerView with a layout manager and an empty adapter initially
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        // Initialize the CouponAdapter with an empty list of coupons and define what happens when the "Mark as Used" button is clicked
-        adapter = CouponAdapter(coupons) { couponCode ->
-            markCouponAsUsed(couponCode) // Call the function to mark the coupon as used
-        }
-        recyclerView.adapter = adapter // Set the adapter to the RecyclerView
+        coupon3TitleTextView = findViewById(R.id.tv_coupon3_title)
+        coupon3DescriptionTextView = findViewById(R.id.tv_coupon3_description)
+        coupon3UsedButton = findViewById(R.id.btn_coupon3_used)
 
         // Get the username passed from the previous activity (LoginActivity or SignUpActivity)
         val username = intent.getStringExtra("username") ?: "Unknown User"
+        findViewById<TextView>(R.id.tv_greeting).text = "Hi, $username!" // Update the greeting TextView
 
-        // Display a greeting with the username in the greeting TextView
-        greetingTextView.text = "Hi, $username!"
-
-        // Fetch coupons for the user from the database through the API
+        // Fetch coupon data for the user from the server
         CoroutineScope(Dispatchers.IO).launch {
-            val fetchedCoupons = fetchCouponsFromDatabase(username)
-
-            withContext(Dispatchers.Main) {
-                if (fetchedCoupons.isNotEmpty()) {
-                    // If coupons are fetched successfully, update the coupons list and notify the adapter
-                    coupons.clear()
-                    coupons.addAll(fetchedCoupons)
-                    adapter.notifyDataSetChanged() // Notify the adapter to refresh the view
-                } else {
-                    // If no coupons are available, show a message to the user
-                    Toast.makeText(this@ProfileActivity, "No coupons available.", Toast.LENGTH_SHORT).show()
-                }
-            }
+            fetchCoupons(username)
         }
+
+        // Set onClickListeners for the "Mark as Used" buttons
+        coupon1UsedButton.setOnClickListener { markCouponAsUsed(coupon1Code, coupon1UsedButton) }
+        coupon2UsedButton.setOnClickListener { markCouponAsUsed(coupon2Code, coupon2UsedButton) }
+        coupon3UsedButton.setOnClickListener { markCouponAsUsed(coupon3Code, coupon3UsedButton) }
     }
 
     /**
-     * This function fetches the user's coupons from the database through the Flask API.
-     * It makes an HTTP GET request to retrieve the coupons for the given username.
+     * Fetches coupon data from the server and updates the TextViews.
      *
-     * @param username The username of the logged-in user whose coupons will be fetched.
-     * @return List of Coupon objects associated with the user.
+     * @param username The username of the logged-in user.
      */
-    private suspend fun fetchCouponsFromDatabase(username: String): List<Coupon> {
-        val coupons = mutableListOf<Coupon>()
+    private suspend fun fetchCoupons(username: String) {
         val client = OkHttpClient()
 
         // Prepare the API request to fetch coupons
@@ -82,39 +81,84 @@ class ProfileActivity : AppCompatActivity() {
             .url("http://45.33.102.27:5000/get_coupons?username=$username")
             .build()
 
-        return try {
+        try {
             // Execute the request and get the response
-            client.newCall(request).execute().use { response ->  // Ensures the response body is closed
-                if (response.isSuccessful) {
-                    val responseBody = response.body?.string()
-                    val jsonResponse = JSONObject(responseBody)
-                    val couponArray = jsonResponse.getJSONArray("coupons")
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful) {
+                val responseBody = response.body?.string()
+                Log.d("ProfileActivity", "Response Body: $responseBody") // Log the response body for debugging
+                val jsonResponse = JSONObject(responseBody)
+                val couponArray = jsonResponse.getJSONArray("coupons")
 
-                    // Loop through the coupons and add them to the list
-                    for (i in 0 until couponArray.length()) {
-                        val couponJson = couponArray.getJSONObject(i)
-                        val title = couponJson.getString("title")
-                        val description = couponJson.getString("description")
-                        val couponCode = couponJson.getString("coupon_code")
-                        val isValid = couponJson.getInt("is_valid") == 1 // Convert 1/0 to true/false
+                // Assuming three static coupons for simplicity
+                if (couponArray.length() > 0) {
+                    // Update the first coupon details
+                    val coupon1Json = couponArray.getJSONObject(0)
+                    updateCouponUI(coupon1Json, coupon1TitleTextView, coupon1DescriptionTextView, coupon1UsedButton)
 
-                        coupons.add(Coupon(title, description, couponCode, isValid))
+                    // Update the second coupon details
+                    val coupon2Json = couponArray.getJSONObject(1)
+                    updateCouponUI(coupon2Json, coupon2TitleTextView, coupon2DescriptionTextView, coupon2UsedButton)
+
+                    // Update the third coupon details
+                    val coupon3Json = couponArray.getJSONObject(2)
+                    updateCouponUI(coupon3Json, coupon3TitleTextView, coupon3DescriptionTextView, coupon3UsedButton)
+                } else {
+                    // Show a message if no coupons are available
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@ProfileActivity, "No coupons available.", Toast.LENGTH_SHORT).show()
                     }
                 }
+            } else {
+                // Handle unsuccessful response
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@ProfileActivity, "Error fetching coupons", Toast.LENGTH_SHORT).show()
+                }
             }
-            coupons // Return the fetched coupons
         } catch (e: IOException) {
             e.printStackTrace()
-            coupons // Return an empty list in case of error
+            withContext(Dispatchers.Main) {
+                Toast.makeText(this@ProfileActivity, "Error fetching coupons", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun updateCouponUI(couponJson: JSONObject, titleTextView: TextView, descriptionTextView: TextView, button: Button) {
+        // Update the UI elements with coupon details
+        titleTextView.text = couponJson.getString("title")
+        descriptionTextView.text = couponJson.getString("description")
+        val isValid = couponJson.getInt("is_valid")
+
+        // Check if the coupon is valid and update the button accordingly
+        if (isValid == 1) {
+            runOnUiThread { // Ensure UI updates are performed on the UI thread
+                button.text = "Mark as Used"
+                button.isEnabled = true
+                button.setBackgroundColor(resources.getColor(R.color.ocean_blue)) // Change to your button color
+            }
+        } else {
+            runOnUiThread { // Ensure UI updates are performed on the UI thread
+                button.text = "Already Used"
+                button.isEnabled = false
+                button.setBackgroundColor(resources.getColor(R.color.gray)) // Assuming you have a gray color defined
+            }
+        }
+
+        // Store coupon code for tracking
+        when (titleTextView.id) {
+            R.id.tv_coupon1_title -> coupon1Code = couponJson.getString("coupon_code")
+            R.id.tv_coupon2_title -> coupon2Code = couponJson.getString("coupon_code")
+            R.id.tv_coupon3_title -> coupon3Code = couponJson.getString("coupon_code")
         }
     }
 
     /**
-     * This function sends an HTTP POST request to the API to mark a coupon as used.
+     * Marks a coupon as used by sending a request to the server.
      *
-     * @param couponCode The coupon code to be marked as used.
+     * @param couponCode The code of the coupon to be marked as used.
+     * @param button The button associated with the coupon being marked as used.
      */
-    private fun markCouponAsUsed(couponCode: String) {
+    private fun markCouponAsUsed(couponCode: String, button: Button) {
         CoroutineScope(Dispatchers.IO).launch {
             val client = OkHttpClient()
 
@@ -137,7 +181,10 @@ class ProfileActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@ProfileActivity, "Coupon marked as used!", Toast.LENGTH_SHORT).show()
-                        refreshCoupons() // Refresh the coupons after marking as used
+                        // Change the button text and state after marking as used
+                        button.text = "Already Used"
+                        button.isEnabled = false
+                        button.setBackgroundColor(resources.getColor(R.color.gray)) // Assuming you have a gray color defined
                     } else {
                         Toast.makeText(this@ProfileActivity, "Failed to mark coupon as used", Toast.LENGTH_SHORT).show()
                     }
@@ -147,26 +194,6 @@ class ProfileActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@ProfileActivity, "Error updating coupon", Toast.LENGTH_SHORT).show()
                 }
-            }
-        }
-    }
-
-    /**
-     * This function refreshes the coupons list after a coupon is marked as used.
-     * It fetches the updated list of coupons and updates the RecyclerView.
-     */
-    private fun refreshCoupons() {
-        // Get the username again to fetch the updated list of coupons
-        val username = intent.getStringExtra("username") ?: return
-
-        // Fetch the updated coupons list in the background
-        CoroutineScope(Dispatchers.IO).launch {
-            val updatedCoupons = fetchCouponsFromDatabase(username)
-            withContext(Dispatchers.Main) {
-                // Update the RecyclerView adapter with the new list of coupons
-                coupons.clear()
-                coupons.addAll(updatedCoupons)
-                adapter.notifyDataSetChanged() // Notify the adapter to refresh the view
             }
         }
     }

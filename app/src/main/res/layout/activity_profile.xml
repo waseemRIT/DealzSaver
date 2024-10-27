@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    File: activity_profile.xml
-    Description: This layout file is for the Profile Page. It includes a greeting text ("Hi, username!")
-                 at the top and a RecyclerView to display the user's coupons in a neat design.
-    Vulnerabilities: None in this layout, but how the coupons are handled could expose vulnerabilities if not implemented securely.
--->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -24,14 +18,88 @@
         android:layout_gravity="center"
         android:paddingBottom="16dp"/>
 
-    <!-- RecyclerView to display the coupons -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewCoupons"
+    <!-- Coupon 1 Title -->
+    <TextView
+        android:id="@+id/tv_coupon1_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:dividerHeight="16dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:padding="8dp" />
+        android:text=""
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"/>
+
+    <!-- Coupon 1 Description -->
+    <TextView
+        android:id="@+id/tv_coupon1_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="16sp"
+        android:paddingBottom="16dp"/>
+
+    <!-- Coupon 1 Mark as Used Button -->
+    <Button
+        android:id="@+id/btn_coupon1_used"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mark as Used"
+        android:backgroundTint="@color/ocean_blue"
+        android:textColor="@android:color/white"/>
+
+    <!-- Coupon 2 Title -->
+    <TextView
+        android:id="@+id/tv_coupon2_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"/>
+
+    <!-- Coupon 2 Description -->
+    <TextView
+        android:id="@+id/tv_coupon2_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="16sp"
+        android:paddingBottom="16dp"/>
+
+    <!-- Coupon 2 Mark as Used Button -->
+    <Button
+        android:id="@+id/btn_coupon2_used"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mark as Used"
+        android:backgroundTint="@color/ocean_blue"
+        android:textColor="@android:color/white"/>
+
+    <!-- Coupon 3 Title -->
+    <TextView
+        android:id="@+id/tv_coupon3_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingBottom="4dp"/>
+
+    <!-- Coupon 3 Description -->
+    <TextView
+        android:id="@+id/tv_coupon3_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="16sp"
+        android:paddingBottom="16dp"/>
+
+    <!-- Coupon 3 Mark as Used Button -->
+    <Button
+        android:id="@+id/btn_coupon3_used"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mark as Used"
+        android:backgroundTint="@color/ocean_blue"
+        android:textColor="@android:color/white"/>
 
 </LinearLayout>
